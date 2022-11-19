@@ -1,11 +1,14 @@
 ﻿using HtmlAgilityPack;
 using System.Net;
+using System.Text;
 
 public class Program
 {
     private static void Main(string[] args)
     {
         WebClient client = new WebClient();
+        StringBuilder st = new StringBuilder();
+
         var pg = 1;
         var counter = 0;
 
@@ -15,15 +18,32 @@ public class Program
             string htmlString = client.DownloadString(url);
             HtmlDocument htmlBelgesi = new HtmlDocument();
             htmlBelgesi.LoadHtml(htmlString);
-            HtmlNodeCollection test = htmlBelgesi.DocumentNode.SelectNodes("//*[@class=\"columnContent\"]/div/a/h3");
-            foreach (var item in test)
+            var selectedHtml = htmlBelgesi.DocumentNode.SelectNodes("//*[@id=\"listingUl\"]");
+
+            foreach (var item in selectedHtml)
             {
-                counter++;
-                Console.WriteLine(counter + " - " + item.InnerText);
+                foreach (var innerItem in item.SelectNodes("li"))
+                {
+                    foreach (var div1 in innerItem.SelectNodes("div"))
+                    {
+                        foreach (var div2 in div1.SelectNodes("div"))
+                        {
+                            foreach (var h3 in div2.SelectNodes("a//h3"))
+                            {
+                                
+                                    st.AppendLine(h3.InnerText); // gelen değeri ekle ve bir altsatıra geç v
+                                
+                            }
+                        }
+                    }
+                }
+                
             }
             pg++;
+           
         }
 
+        Console.WriteLine(st.ToString());
         Console.ReadKey();
     }
 }
